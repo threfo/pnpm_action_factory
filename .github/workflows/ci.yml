@@ -1,0 +1,138 @@
+name: Build and Push dist to OSS
+on:
+  release:
+    types: [created]
+# 使用并发取消任何当前作业或运行
+concurrency:
+  group: ${{github.ref}}
+  cancel-in-progress: true
+jobs:
+  osr_console_action_tigger:
+    if:  startsWith(github.ref, 'refs/tags/btp_frontend/') || startsWith(github.ref, 'refs/tags/btp_console/')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: 从tag中解析出当前构建的分支，仓库等，并暴露到环境变量中
+        uses: threfo/tag-parse-action@master
+        with:
+          githubToken: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: 拉取私有仓库的代码
+        uses: actions/checkout@master
+        with:
+          repository: threfo/${{ env.REPOSITORY }}
+          token: ${{ secrets.ACCESS_TOKEN }}
+          ref: ${{ env.BRANCH }}
+      
+      - name: Cache pnpm modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 6.x
+          
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: 项目构建
+        run: pnpm build --filePath="${{ env.syncBranch }}/default" --syncBranch="${{ env.syncBranch }}"
+
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYMMDDHHmm
+          utcOffset: '+08:00'
+
+      - name: Use current time
+        env:
+          F_TIME: '${{ steps.current-time.outputs.formattedTime }}'
+        run: echo "NOW=$F_TIME" >> $GITHUB_ENV
+      
+      - name: 上传到腾讯云COS
+        uses: zkqiang/tencent-cos-action@v0.1.0
+        with:
+          args: upload ./dist/index.html /${{ env.REPOSITORY }}/${{ env.syncBranch }}/default/index.html
+          secret_id: ${{ secrets.OSS_SECRET_ID }}
+          secret_key: ${{ secrets.OSS_SECRET_KEY }}
+          bucket: ${{ secrets.OSS_BUCKET }}
+          region: ${{ secrets.OSS_REGION }}
+
+
+      - name: 同步私有化分支
+        if: ${{ startsWith( env.syncBranch, 'release/') }}
+        uses: threfo/sync-branches-action@master
+        with:
+          githubToken: ${{ secrets.ACCESS_TOKEN }}
+          repository: threfo/${{ env.REPOSITORY }}
+          headBranch: ${{ env.BRANCH }}
+          syncBranches: ${{ env.syncBranch }}
+
+      - name: 构建成功消息
+        if: ${{ success() }}
+        env:
+          BOT_KEY: ${{ secrets.WORK_WECHAT_GITHUB_ROBOT_KEY }}
+          POST_MESSAGE: 🎉 项目${{ env.REPOSITORY }}，分支${{ env.syncBranch }}构建成功。--- Github Actions
+        uses: chhpt/wechat-work-messenger@v1.0.0
+
+      - name: 构建失败消息
+        if: ${{ failure() }}
+        env:
+          BOT_KEY: ${{ secrets.WORK_WECHAT_GITHUB_ROBOT_KEY }}
+          POST_MESSAGE: ❌ 项目${{ env.REPOSITORY }}，分支${{ env.syncBranch }}构建失败。--- Github Actions
+        uses: chhpt/wechat-work-messenger@v1.0.0
+  xclient_action_tigger:
+    if:  startsWith(github.ref, 'refs/tags/xclient/')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: 从tag中解析出当前构建的分支，仓库等，并暴露到环境变量中
+        uses: threfo/tag-parse-action@master
+        with:
+          githubToken: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: 拉取私有仓库的代码
+        uses: actions/checkout@master
+        with:
+          repository: threfo/${{ env.REPOSITORY }}
+          token: ${{ secrets.ACCESS_TOKEN }}
+          ref: ${{ env.BRANCH }}
+          
+     - name: Cache pnpm modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 6.x
+          
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: xclient项目构建
+        run: pnpm release --branch ${{ env.BRANCH }}
+
+
+
+
