@@ -7,8 +7,48 @@ concurrency:
   group: ${{github.ref}}
   cancel-in-progress: true
 jobs:
+  xclient_action_tigger:
+    if:  startsWith(github.ref, 'refs/tags/xclient/')
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: 从tag中解析出当前构建的分支，仓库等，并暴露到环境变量中
+        uses: threfo/tag-parse-action@master
+        with:
+          githubToken: ${{ secrets.ACCESS_TOKEN }}
+
+      - name: 拉取私有仓库的代码
+        uses: actions/checkout@master
+        with:
+          repository: threfo/${{ env.REPOSITORY }}
+          token: ${{ secrets.ACCESS_TOKEN }}
+          ref: ${{ env.BRANCH }}
+          
+     - name: Cache pnpm modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 6.x
+          
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: xclient项目构建
+        run: pnpm release --branch ${{ env.BRANCH }}
   osr_console_action_tigger:
-    if:  startsWith(github.ref, 'refs/tags/btp_frontend/') || startsWith(github.ref, 'refs/tags/btp_console/')
+    if:  startsWith(github.ref, 'refs/tags/btp_frontend/') || startsWith(github.ref, 'refs/tags/btp_console/') || startsWith(github.ref, 'refs/tags/btp_f_osr_monorepo/')
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -92,46 +132,7 @@ jobs:
           BOT_KEY: ${{ secrets.WORK_WECHAT_GITHUB_ROBOT_KEY }}
           POST_MESSAGE: ❌ 项目${{ env.REPOSITORY }}，分支${{ env.syncBranch }}构建失败。--- Github Actions
         uses: chhpt/wechat-work-messenger@v1.0.0
-  xclient_action_tigger:
-    if:  startsWith(github.ref, 'refs/tags/xclient/')
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-    steps:
-      - name: 从tag中解析出当前构建的分支，仓库等，并暴露到环境变量中
-        uses: threfo/tag-parse-action@master
-        with:
-          githubToken: ${{ secrets.ACCESS_TOKEN }}
-
-      - name: 拉取私有仓库的代码
-        uses: actions/checkout@master
-        with:
-          repository: threfo/${{ env.REPOSITORY }}
-          token: ${{ secrets.ACCESS_TOKEN }}
-          ref: ${{ env.BRANCH }}
-          
-     - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-
-
-      - uses: pnpm/action-setup@v2.0.1
-        with:
-          version: 6.x
-          
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14.x'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: xclient项目构建
-        run: pnpm release --branch ${{ env.BRANCH }}
+  
 
 
 
