@@ -67,13 +67,32 @@ jobs:
           F_TIME: '${{ steps.current-time.outputs.formattedTime }}'
         run: echo "NOW=$F_TIME" >> $GITHUB_ENV
       
-      - name: 上传到腾讯云COS
+      - name: 上传Html到腾讯云COS
         uses: zkqiang/tencent-cos-action@v0.1.0
         with:
           args: upload ./dist/index.html /${{ env.REPOSITORY }}/${{ env.syncBranch }}/default/index.html
           secret_id: ${{ secrets.OSS_SECRET_ID }}
           secret_key: ${{ secrets.OSS_SECRET_KEY }}
           bucket: ${{ secrets.OSS_BUCKET }}
+          region: ${{ secrets.OSS_REGION }}
+
+
+      - name: 上传html到腾讯云COS-备份版本
+        uses: zkqiang/tencent-cos-action@v0.1.0
+        with:
+          args: upload ./dist/index.html /${{ env.REPOSITORY }}/${{ env.syncBranch }}/${{ env.NOW }}/index.html --ignore *.map
+          secret_id: ${{ secrets.OSS_SECRET_ID }}
+          secret_key: ${{ secrets.OSS_SECRET_KEY }}
+          bucket: ${{ secrets.OSS_BUCKET }}
+          region: ${{ secrets.OSS_REGION }}
+      
+      - name: 上传除html以外的静态资源到腾讯云COS另外的桶
+        uses: zkqiang/tencent-cos-action@v0.1.0
+        with:
+          args: upload ./dist / --ignore *.{map,html}
+          secret_id: ${{ secrets.OSS_SECRET_ID }}
+          secret_key: ${{ secrets.OSS_SECRET_KEY }}
+          bucket: ${{ secrets.OSS_ASSETS_BUCKET }}
           region: ${{ secrets.OSS_REGION }}
 
 
