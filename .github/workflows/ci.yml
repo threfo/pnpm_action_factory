@@ -89,7 +89,7 @@ jobs:
       - name: 上传除html以外的静态资源到腾讯云COS另外的桶
         uses: zkqiang/tencent-cos-action@v0.1.0
         with:
-          args: upload ./dist / --ignore *.{map,html}
+          args: upload ./dist/ / --ignore *.{map,html}
           secret_id: ${{ secrets.OSS_SECRET_ID }}
           secret_key: ${{ secrets.OSS_SECRET_KEY }}
           bucket: ${{ secrets.OSS_ASSETS_BUCKET }}
