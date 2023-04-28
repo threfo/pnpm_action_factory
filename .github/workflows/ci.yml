@@ -107,17 +107,18 @@ jobs:
 
       - name: 构建成功消息
         if: ${{ success() }}
-        env:
-          BOT_KEY: ${{ secrets.WORK_WECHAT_GITHUB_ROBOT_KEY }}
-          POST_MESSAGE: 🎉 项目${{ env.REPOSITORY }}，分支${{ env.syncBranch }}构建成功。--- Github Actions
-        uses: chhpt/wechat-work-messenger@v1.0.0
-
+        uses: 2bitlab/work-wechat-msg@master
+        with:
+          botKey: ${{ secrets.WORK_WECHAT_GITHUB_ROBOT_KEY }}
+          markdown: 🎉 项目${{ env.REPOSITORY }}，分支${{ env.syncBranch }}构建成功。--- Github Actions
+        
       - name: 构建失败消息
         if: ${{ failure() }}
-        env:
-          BOT_KEY: ${{ secrets.WORK_WECHAT_GITHUB_ROBOT_KEY }}
-          POST_MESSAGE: ❌ 项目${{ env.REPOSITORY }}，分支${{ env.syncBranch }}构建失败。--- Github Actions
-        uses: chhpt/wechat-work-messenger@v1.0.0
+        uses: 2bitlab/work-wechat-msg@master
+        with:
+          botKey: ${{ secrets.WORK_WECHAT_GITHUB_ROBOT_KEY }}
+          markdown: ❌ 项目${{ env.REPOSITORY }}，分支${{ env.syncBranch }}构建失败。--- Github Actions
+        
   
 
 
