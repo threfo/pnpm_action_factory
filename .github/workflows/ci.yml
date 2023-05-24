@@ -99,27 +99,27 @@ jobs:
 
 
       - name: 同步私有化分支
-        if: ${{ startsWith( env.syncBranch, 'release/') }}
+        if: ${{ startsWith( env.SYNC_BRANCH, 'release/') }}
         uses: threfo/sync-branches-action@master
         with:
           githubToken: ${{ secrets.ACCESS_TOKEN }}
           repository: threfo/${{ env.REPOSITORY }}
           headBranch: ${{ env.BRANCH }}
-          syncBranches: ${{ env.syncBranch }}
+          syncBranches: ${{ env.SYNC_BRANCH }}
 
       - name: 构建成功消息
         if: ${{ success() }}
         uses: threfo/work-wechat-msg@main
         with:
           botKey: ${{ secrets.WORK_WECHAT_GITHUB_ROBOT_KEY }}
-          content: 🎉 项目${{ env.REPOSITORY }}，分支${{ env.syncBranch }}构建成功。--- Github Actions
+          content: 🎉 项目${{ env.REPOSITORY }}，分支${{ env.SYNC_BRANCH }}, 构建命令${{ env.RUN_COMMAND }}，上传到/${{ env.REPOSITORY }}${{ env.APP_PATH }}/${{ env.SYNC_BRANCH }} 构建成功。--- Github Actions
         
       - name: 构建失败消息
         if: ${{ failure() }}
         uses: threfo/work-wechat-msg@main
         with:
           botKey: ${{ secrets.WORK_WECHAT_GITHUB_ROBOT_KEY }}
-          content: ❌ 项目${{ env.REPOSITORY }}，分支${{ env.syncBranch }}构建失败。--- Github Actions
+          content: ❌ 项目${{ env.REPOSITORY }}，分支${{ env.SYNC_BRANCH }}, 构建命令${{ env.RUN_COMMAND }}，上传到/${{ env.REPOSITORY }}${{ env.APP_PATH }}/${{ env.SYNC_BRANCH }} 构建失败。--- Github Actions
         
   
 
