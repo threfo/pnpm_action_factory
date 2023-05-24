@@ -53,7 +53,7 @@ jobs:
         run: pnpm install
 
       - name: 项目构建
-        run: pnpm build
+        run: pnpm run ${{ env.RUN_COMMAND }}
 
       - name: Get current time
         uses: 1466587594/get-current-time@v2
@@ -66,6 +66,15 @@ jobs:
         env:
           F_TIME: '${{ steps.current-time.outputs.formattedTime }}'
         run: echo "NOW=$F_TIME" >> $GITHUB_ENV
+
+      - name: 上传除html以外的静态资源到腾讯云COS另外的桶
+        uses: zkqiang/tencent-cos-action@v0.1.0
+        with:
+          args: upload -rs ./dist/ / --ignore *.html
+          secret_id: ${{ secrets.OSS_SECRET_ID }}
+          secret_key: ${{ secrets.OSS_SECRET_KEY }}
+          bucket: ${{ secrets.OSS_ASSETS_BUCKET }}
+          region: ${{ secrets.OSS_REGION }}
       
       - name: 上传Html到腾讯云COS
         uses: zkqiang/tencent-cos-action@v0.1.0
@@ -86,14 +95,7 @@ jobs:
           bucket: ${{ secrets.OSS_BUCKET }}
           region: ${{ secrets.OSS_REGION }}
       
-      - name: 上传除html以外的静态资源到腾讯云COS另外的桶
-        uses: zkqiang/tencent-cos-action@v0.1.0
-        with:
-          args: upload -rs ./dist/ / --ignore *.html
-          secret_id: ${{ secrets.OSS_SECRET_ID }}
-          secret_key: ${{ secrets.OSS_SECRET_KEY }}
-          bucket: ${{ secrets.OSS_ASSETS_BUCKET }}
-          region: ${{ secrets.OSS_REGION }}
+      
 
 
       - name: 同步私有化分支
