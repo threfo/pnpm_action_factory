@@ -53,7 +53,7 @@ jobs:
         run: pnpm -v && pnpm install --no-frozen-lockfile
 
       - name: 项目构建
-        run: export BUILD_BRANCH=/ && pnpm run ${{ env.RUN_COMMAND }}
+        run: export BUILD_BRANCH=${{ secrets.OSS_BUCKET }} && pnpm run ${{ env.RUN_COMMAND }}
 
       - name: Get current time
         uses: 1466587594/get-current-time@v2
