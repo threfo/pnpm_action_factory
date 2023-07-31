@@ -4,7 +4,7 @@ on:
     types: [created]
 # 使用并发取消任何当前作业或运行
 concurrency:
-  group: ${{github.ref}}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build:
