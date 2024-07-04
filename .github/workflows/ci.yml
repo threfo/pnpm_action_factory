@@ -24,17 +24,8 @@ jobs:
           token: ${{ secrets.ACCESS_TOKEN }}
           ref: ${{ env.BRANCH }}
       
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - uses: pnpm/action-setup@v2.0.1
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 8.6.0
-          run_install: false
+      - uses: volta-cli/action@v4
+        name: Install volta
 
       - name: Get pnpm store directory
         id: pnpm-cache
