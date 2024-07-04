@@ -28,6 +28,7 @@ jobs:
         name: Install volta
 
       - name: Install pnpm
+        run: volta install node
         run: volta install pnpm
 
       - name: Get pnpm store directory
