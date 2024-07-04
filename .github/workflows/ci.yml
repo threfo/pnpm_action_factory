@@ -26,6 +26,7 @@ jobs:
       
       - uses: volta-cli/action@v4
         name: Install volta
+        run: volta install pnpm
 
       - name: Get pnpm store directory
         id: pnpm-cache
