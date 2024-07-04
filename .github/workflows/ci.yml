@@ -27,8 +27,10 @@ jobs:
       - uses: volta-cli/action@v4
         name: Install volta
 
-      - name: Install pnpm
+      - name: Install node
         run: volta install node
+
+      - name: Install pnpm
         run: volta install pnpm
 
       - name: Get pnpm store directory
