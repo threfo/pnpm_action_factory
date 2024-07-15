@@ -47,7 +47,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       
       - name: change taobao
-        run: npm config set registry https://skimdb.npmjs.com/registry
+        run: npm config set registry https://r.cnpmjs.org
 
       - name: Install dependencies
         run: pnpm -v && pnpm install --no-frozen-lockfile
