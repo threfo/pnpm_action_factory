@@ -45,9 +45,15 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+      
+      - name: add nrm
+        run: pnpm add -g nrm
+
+      - name: change taobao
+        run: nrm use taobao
 
       - name: Install dependencies
-        run: pnpm -v && pnpm install
+        run: pnpm -v && pnpm install --no-frozen-lockfile
 
       - name: 项目构建
         run: export BUILD_BRANCH=${{ secrets.BRANCH }} && pnpm run ${{ env.RUN_COMMAND }}
