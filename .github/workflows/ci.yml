@@ -46,11 +46,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       
-      - name: change taobao
-        run: npm config set registry https://r.cnpmjs.org
+     # - name: change taobao
+      #  run: npm config set registry https://r.cnpmjs.org
 
       - name: Install dependencies
-        run: pnpm -v && pnpm install --no-frozen-lockfile
+        run: pnpm -v && pnpm install --frozen-lockfile
 
       - name: 项目构建
         run: export BUILD_BRANCH=${{ secrets.BRANCH }} && pnpm run ${{ env.RUN_COMMAND }}
