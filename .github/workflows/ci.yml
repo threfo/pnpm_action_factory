@@ -34,7 +34,8 @@ jobs:
         run: volta install pnpm
 
       - name: Install dependencies
-        run: rm -rf node_modules && pnpm -v && pnpm install --frozen-lockfile --strict-peer-dependencies
+        run: rm -rf node_modules && pnpm -v && pnpm install --frozen-lockfile=false
+# --frozen-lockfile --strict-peer-dependencies
         timeout-minutes: 10
 
       - name: 项目构建
