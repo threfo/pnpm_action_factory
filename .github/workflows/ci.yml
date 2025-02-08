@@ -27,11 +27,13 @@ jobs:
       - uses: volta-cli/action@v4
         name: Install volta
 
-      - name: Install node
-        run: volta install node
+      #- name: Install node
+      #  run: volta install node
 
-      - name: Install pnpm
-        run: volta install pnpm
+      #- name: Install pnpm
+      #  run: volta install pnpm
+      - name: Install Node and pnpm
+        run: volta install
 
       - name: Install dependencies
         run: rm -rf node_modules && pnpm -v && pnpm install --frozen-lockfile=false
