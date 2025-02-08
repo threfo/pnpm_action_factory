@@ -36,8 +36,8 @@ jobs:
       - name: Install dependencies
         run: ｜
           rm -rf node_modules pnpm-store
-          pnpm -v 
-          pnpm install --frozen-lockfile --strict-peer-dependencies
+          && pnpm -v 
+          && pnpm install --frozen-lockfile --strict-peer-dependencies
         timeout-minutes: 10
 
       - name: 项目构建
