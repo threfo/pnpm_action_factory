@@ -32,15 +32,22 @@ jobs:
         run: volta install node && node -v
 
       - name: Install pnpm & Install dependencies
-        run: export VOLTA_FEATURE_PNPM=1 && volta install pnpm && pnpm -v && rm -rf node_modules && pnpm install --frozen-lockfile
+        run: |
+          export VOLTA_FEATURE_PNPM=1 
+          volta install pnpm 
+          pnpm -v 
+          rm -rf node_modules 
+          pnpm install --frozen-lockfile
+          export BUILD_BRANCH=${{ secrets.BRANCH }}
+          pnpm run ${{ env.RUN_COMMAND }}
         timeout-minutes: 10
 
      # - name: Install dependencies
      #   run: rm -rf node_modules && pnpm install --frozen-lockfile
      #   timeout-minutes: 10
 
-      - name: 项目构建
-        run: export BUILD_BRANCH=${{ secrets.BRANCH }} && pnpm run ${{ env.RUN_COMMAND }}
+     # - name: 项目构建
+     #   run: export BUILD_BRANCH=${{ secrets.BRANCH }} && pnpm run ${{ env.RUN_COMMAND }}
 
       - name: Get current time
         uses: 1466587594/get-current-time@v2
