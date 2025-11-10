@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@master
         with:
           repository: threfo/${{ env.REPOSITORY }}
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.ACCESS_TOKEN }}
           ref: ${{ env.BRANCH }}
       
       - uses: volta-cli/action@v4
