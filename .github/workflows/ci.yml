@@ -15,13 +15,13 @@ jobs:
       - name: 从tag中解析出当前构建的分支，仓库等，并暴露到环境变量中
         uses: threfo/tag-parse-action@master
         with:
-          githubToken: ${{ secrets.ACCESS_TOKEN }}
+          githubToken: ${{ secrets.GH_PAT }}
 
       - name: 拉取私有仓库的代码
         uses: actions/checkout@master
         with:
           repository: threfo/${{ env.REPOSITORY }}
-          token: ${{ secrets.ACCESS_TOKEN }}
+          token: ${{ secrets.GH_PAT }}
           ref: ${{ env.BRANCH }}
       
       - uses: volta-cli/action@v4
